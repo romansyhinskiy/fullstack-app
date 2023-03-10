@@ -5,6 +5,7 @@ const app = express();
 import dotenv from "dotenv";
 dotenv.config();
 
+import morgan from "morgan";
 // connection to db
 import connectDb from "./db/connect.js";
 // routes
@@ -16,6 +17,10 @@ import notFoundMiddleware from "./middleware/not-found.js";
 import errorHandlerMiddleware from "./middleware/error-handler.js";
 
 const port = process.env.PORT || 5000;
+
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev"));
+}
 
 app.use(express.json());
 

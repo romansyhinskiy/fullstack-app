@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Wrapper from "../../assets/wrappers/RegisterPage.js";
 import { Logo, FormRow, Alert } from "../../components/index";
 import { useAppContext } from "../../context/appContext.js";
@@ -8,37 +9,53 @@ const initialState = {
   name: "",
   email: "",
   password: "",
-  isMember: "",
+  isMember: true,
 };
 
 export const Register = () => {
   const [values, setValues] = useState(initialState);
-  const { showAlert, displayAlert } = useAppContext();
+  const navigate = useNavigate();
+  const { user, showAlert, displayAlert, isLoading, registerUser, loginUser } =
+    useAppContext();
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    }
+  }, [user, navigate]);
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
   const onSubmit = (e) => {
     e.preventDefault();
     const { name, email, password, isMember } = values;
-    if (!email || !password) {
+    if (!email || !password || (!isMember && !name)) {
       displayAlert();
       return;
+    }
+    const currentUser = { name, email, password };
+    if (isMember) {
+      loginUser(currentUser);
+    } else {
+      registerUser(currentUser);
     }
   };
   const toggleMember = () => {
     setValues({ ...values, isMember: !values.isMember });
   };
+
   return (
     <Wrapper className="full-page">
       <form className="form" onSubmit={onSubmit}>
         <Logo />
-        <h3>{values.isMember ? "register" : "login"}</h3>
+        <h3>{!values.isMember ? "register" : "login"}</h3>
         {showAlert && <Alert />}
         {/* name */}
-        {values.isMember && (
+        {!values.isMember && (
           <FormRow
             type="text"
-            name="text"
+            name="name"
             value={values.name}
             handleChange={handleChange}
             labelText="name"
@@ -65,7 +82,12 @@ export const Register = () => {
         </button>
         <p>
           {values.isMember ? "Already a member?" : "Not a member yet?"}
-          <button type="button" onClick={toggleMember} className="member-btn">
+          <button
+            type="button"
+            onClick={toggleMember}
+            className="member-btn"
+            disabled={isLoading}
+          >
             {values.isMember ? "Login" : "Register"}
           </button>
         </p>
