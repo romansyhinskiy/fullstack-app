@@ -21,7 +21,7 @@ export const Register = () => {
     if (user) {
       setTimeout(() => {
         navigate("/");
-      }, 3000);
+      }, 1500);
     }
   }, [user, navigate]);
   const handleChange = (e) => {
