@@ -1,11 +1,12 @@
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError } from "../errors/index.js";
-import Job from "../models/user.js";
+import Job from "../models/job.js";
 
 const createJob = async (req, res) => {
   const { position, company } = req.body;
+
   if (!position || !company) {
-    throw new BadRequestError("Please provide all values!");
+    throw new BadRequestError("Please Provide All Values");
   }
 
   req.body.createdBy = req.user.userId;
@@ -15,7 +16,10 @@ const createJob = async (req, res) => {
 };
 
 const getAllJobs = async (req, res) => {
-  res.send("getAllJobs");
+  const jobs = await Job.find({ createdBy: req.user.userId });
+  res
+    .status(StatusCodes.OK)
+    .json({ jobs, totalJobs: jobs.length, numOfPages: 1 });
 };
 
 const showStats = async (req, res) => {
